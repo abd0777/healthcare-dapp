@@ -1,3 +1,3 @@
 # healthcare-dapp
 
-node version required ^20.19.1
+node version required >=20.19.1
