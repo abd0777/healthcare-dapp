@@ -7,8 +7,9 @@ function Navbar() {
           <div className='text-2xl font-semibold'>Health Ledger</div>
       </nav>
 
-      <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight text-center">
-        <span className="bg-gradient-to-r from-gray-500 via-slate-300 to-white bg-clip-text text-transparent drop-shadow-lg">
+      <h1 className='text-gray-400'>Hello World</h1>
+      <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-center">
+        <span className="bg-gradient-to-r from-slate-300 via-slate-300 to-slate-300 bg-clip-text text-transparent drop-shadow-lg">
           Revolutionizing Healthcare with Blockchain Technology
         </span>
       </h1>
