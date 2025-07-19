@@ -1,5 +1,6 @@
-import React from 'react';
 import Navbar from '../components/Navbar.jsx'; 
+import Hero from '../components/Hero.jsx';
+
 function LandingPage() {
     return (
         <div>
@@ -19,7 +20,7 @@ function LandingPage() {
             />
                 {/* Your Content/Components */}
                <Navbar />
-                
+               <Hero />
             </div>
 
              
