@@ -1,11 +1,12 @@
-import React from 'react'
+import { Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage.jsx'
 
 function App() {
   return (
-    <div>
-      <LandingPage />
-    </div>
+    <Routes>
+      <Route path="/" element = {<LandingPage />} />
+
+    </Routes>
   )
 }
 
