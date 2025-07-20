@@ -23,7 +23,6 @@ function Navbar() {
 
       </nav>
 
-      <h1 className='text-gray-400'>Hello World</h1>
       
 
        
