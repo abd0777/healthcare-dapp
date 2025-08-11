@@ -18,7 +18,7 @@ function LandingPage() {
                 backgroundSize: "40px 40px, 40px 40px, 100% 100%",
                 }}
             />
-                {/* Your Content/Components */}
+              
                <Navbar />
                <Hero />
             </div>
