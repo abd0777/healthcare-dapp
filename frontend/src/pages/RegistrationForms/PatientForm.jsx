@@ -7,7 +7,7 @@ function PatientForm() {
   const [dob, setDob] = useState(null);
   return (
     <div className='text-black'>
-        <div className='text-center text-2xl'> Patient Form  </div>
+        <div className='text-center text-2xl'> Patient Registration Form  </div>
         <form>
             <div>
                 <label className='text-sm font-semibold text-gray-600'>

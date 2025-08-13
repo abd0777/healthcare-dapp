@@ -9,7 +9,7 @@ const UserType = ({ userType, setUserType }) => {
   ];
 
   return (
-    <div className="flex justify-center gap-4">
+    <div className="flex justify-center gap-4 mb-5">
       {types.map((type) => (
         <button
           key={type.key}
