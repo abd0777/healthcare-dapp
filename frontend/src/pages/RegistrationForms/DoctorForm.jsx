@@ -29,7 +29,8 @@ function DoctorForm() {
           <label className="text-sm font-semibold text-gray-600">
             Date of Birth
           </label>
-          <DatePicker
+          <div>
+            <DatePicker
             selected={dob}
             onChange={(date) => setDob(date)}
             dateFormat="dd-MM-yyyy"
@@ -39,6 +40,7 @@ function DoctorForm() {
             placeholderText="Select your DOB"
             className="input-field"
           />
+          </div>
         </div>
         <div>
           <label className="text-sm font-semibold text-gray-600">Gender</label>
