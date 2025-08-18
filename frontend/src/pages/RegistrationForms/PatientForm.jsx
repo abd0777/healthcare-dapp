@@ -28,6 +28,7 @@ function PatientForm({ setFormData }) {
   }, [fullname, email, phone, dob, gender, address, govtId, password, setFormData]);
 
   return (
+
     <div className="text-black">
       <div className="text-center text-2xl mb-4">Patient Registration Form</div>
 
