@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),
@@ -36,7 +37,16 @@ export default function Login() {
       localStorage.setItem("role", data.role); // store role too
 
       alert("Login successful!");
-      navigate("/");
+
+      const dashboardRoutes = {
+        patient: "/Dashboard_patient",
+        doctor: "/Dashboard_doctor",
+        pharmacy: "/Dashboard_pharmacy",
+        insurer: "/Dashboard_insurer"
+      }
+      
+      navigate(dashboardRoutes[data.role] || "/");
+
     } catch (err) {
       setLoading(false);
       alert(err.message);

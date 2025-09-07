@@ -4,6 +4,7 @@ import PatientForm from './RegistrationForms/PatientForm';
 import DoctorForm from './RegistrationForms/DoctorForm';
 import PharmacyForm from './RegistrationForms/PharmacyForm';
 import InsurerForm from './RegistrationForms/InsurerForm';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 const RegisterPage = () => {
   const [userType, setUserType] = useState('patient');
@@ -26,7 +27,7 @@ const RegisterPage = () => {
     });
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${BACKEND_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
