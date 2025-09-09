@@ -12,6 +12,8 @@
 }
 body {
   font-family: "Saira", sans-serif;
+  background-color:white;
+  color: black;
 }
 
 .input-field {
