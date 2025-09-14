@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     fullname: { type: String }, // Not required for pharmacy, insurer
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, index:true },
     phone: { type: String, required: true },
     password: { type: String, required: true, minlength: 6 },
     gender: {

@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
+import Profile from '../patient_dashboard/Profile'
+import Logout from '../patient_dashboard/Logout'
 
 function Dashboard_patient(){
     const [activeSection, setActiveSection] = useState('My Profile');
-
+    
     const renderContent = () => {
         switch (activeSection) {
             case 'My Profile':
-                return <div>👤 Profile Info goes here</div>;
+                return <Profile />;
             case 'My Records':
                 return <div>📁 Medical Records displayed here</div>;
             case 'Book Appointment':
@@ -14,7 +16,7 @@ function Dashboard_patient(){
             case 'Consultation History':
                 return <div>🩺 Past Consultations listed here</div>;
             case 'Logout':
-                return <div>🚪 You have been logged out</div>;
+                return <Logout />;
             default:
                 return <div>Select an option from the sidebar</div>;
         }

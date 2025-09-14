@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -15,6 +16,10 @@ mongoose.connect(process.env.MONGO_DB_URI)
   .catch(err => console.error("MongoDB Error 💀", err.message));
 
 app.use("/api/auth", authRoutes);
+//app.use("/api/auth/logout", authRoutes);
+app.use("/api/users", userRoutes);
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

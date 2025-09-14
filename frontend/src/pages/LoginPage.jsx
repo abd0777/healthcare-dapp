@@ -35,7 +35,8 @@ export default function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role); // store role too
-
+      localStorage.setItem("email", email); // store email for fetching profile
+      
       alert("Login successful!");
 
       const dashboardRoutes = {
