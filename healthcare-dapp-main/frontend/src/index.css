@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font utility */
+.saira-bold {
+  font-family: "Saira", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+/* form / small helpers */
+.input-field {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  color: #6b21a8;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: #c084fc;
+  box-shadow: 0 0 0 2px rgba(196, 128, 252, 0.4);
+}
+
+.menu-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: large;
+}
+.menu-item:hover {
+  background-color: #d0d0d0;
+}
+
+/* -------------------------
+    Design system variables (LIGHT THEME)
+    ------------------------- */
+@layer base {
+  :root {
+    /* core hsl triplets (use with hsl(var(--name)) ) */
+    --background: 0 0% 100%; /* White background */
+    --foreground: 220 26% 8%; /* Dark text for primary content */
+
+    --card: 0 0% 100%; /* White card background */
+    --card-foreground: 220 26% 8%; /* Dark text on cards */
+
+    --popover: 0 0% 100%; /* White popover background */
+    --popover-foreground: 220 26% 8%; /* Dark text on popovers */
+
+    --primary: 217 91% 60%; /* Main bluish color (kept the same) */
+    --primary-foreground: 0 0% 100%; /* White text for primary button */
+    --primary-glow: 217 91% 70%;
+
+    --secondary: 220 26% 96%; /* Lighter gray for secondary elements */
+    --secondary-foreground: 220 26% 8%; /* Dark text on secondary elements */
+
+    --muted: 210 40% 96.1%; /* Very light gray for subtle backgrounds */
+    --muted-foreground: 215 20% 45%; /* Muted gray for secondary text */
+
+    --accent: 260 100% 80%; /* Accent bluish-purple (kept the same) */
+    --accent-foreground: 220 26% 8%; /* Dark text on accent elements */
+
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 220 26% 8%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 26% 90%; /* Light gray border */
+    --input: 220 26% 96%; /* Light gray input background */
+    --ring: 217 91% 60%;
+
+    --radius: 0.5rem;
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(217 91% 60%),
+      hsl(260 100% 80%)
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(220 26% 98%), /* Very light gray gradient for white cards */
+      hsl(220 26% 95%)
+    );
+    --gradient-accent: linear-gradient(
+      90deg,
+      hsl(var(--success)),
+      hsl(142 76% 45%)
+    );
+
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
+    --shadow-card: 0 10px 30px -10px hsl(220 26% 4% / 0.1); /* Lighter shadow */
+    --shadow-feature: 0 4px 20px hsl(var(--primary) / 0.15);
+
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: box-shadow 0.3s ease, transform 0.2s ease;
+  }
+
+  /* The original dark theme block has been removed for a light-only approach */
+
+  /* sensible global defaults */
+  * {
+    box-sizing: border-box;
+  }
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    font-family: "Saira", sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* -------------------------
+    Components (explicit CSS)
+    ------------------------- */
+@layer components {
+  /* Hero gradient text — explicit so it doesn't depend on Tailwind color config */
+  .gradient-text {
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--primary)),
+      hsl(var(--accent))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Glowing button effect */
+  .glow-on-hover {
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    will-change: transform, box-shadow;
+  }
+
+  .glow-on-hover:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Blockchain connectivity animation */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-glow {
+    from {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.4);
+    }
+    to {
+      box-shadow: 0 0 30px hsl(var(--primary) / 0.6),
+        0 0 40px hsl(var(--primary) / 0.3);
+    }
+  }
+
+  /* Feature card (explicit gradients and borders) */
+  .feature-card {
+    background-image: var(--gradient-card);
+    border: 1px solid hsl(var(--border) / 0.5);
+    border-radius: var(--radius);
+    padding: 1rem;
+    backdrop-filter: blur(6px);
+    transition: var(--transition-smooth);
+  }
+
+  .feature-card:hover {
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: var(--shadow-feature);
+    transform: translateY(-4px);
+  }
+}

@@ -6,7 +6,7 @@ function Navbar() {
   const navigate  = useNavigate();
   return (
     <div>
-      <nav className="sticky top-0 left-0 w-full z-50 bg-gray-800 p-4 text-white bg-white/5 backdrop-blur-md border-b-[1px] border-white/20">
+      <nav className="sticky top-0 left-0 w-full z-50 p-4 text-white bg-white/5 backdrop-blur-md border-b-[1px] border-white/20">
           
           <Flex as="nav" px={6} align="center" justify="space-between">
             <img src="/icon.png" alt="logo" style={{ height: '30px', width:'40px', marginRight:'5px', userSelect:'none'}}/>
