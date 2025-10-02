@@ -19,6 +19,7 @@ mongoose
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/doctors", userRoutes);
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -38,7 +39,7 @@ app.post("/api/get-specialist-recommendation", async (req, res) => {
 
     let cleanText = response.text.replace(/\*\*/g, "").trim();
     res.json({ response: cleanText });
-    
+
   } catch (error) {
     console.error("Gemini API error:", error);
     res.status(500).json({ response: "Error generating recommendation." });

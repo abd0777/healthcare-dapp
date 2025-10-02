@@ -12,3 +12,15 @@ export const getUserProfile = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const getDoctorProfiles = async (req, res) => {
+  try {
+    const doctors = await User.find({ role: "doctor" }).select(
+      "fullname email phone specialization licenseNumber clinicAddress profilePic"
+    );
+    res.json(doctors);
+  } catch (error) {
+    console.error("Error fetching doctors:", error);
+    res.status(500).json({ error: "Failed to fetch doctors" });
+  }
+};
