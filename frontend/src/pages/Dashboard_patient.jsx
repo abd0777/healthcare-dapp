@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Profile from "../patient_dashboard/Profile";
 import Logout from "../patient_dashboard/Logout";
+import Appointment from "@/patient_dashboard/Appointment";
 
 function Dashboard_patient() {
   const [activeSection, setActiveSection] = useState("My Profile");
@@ -12,7 +13,7 @@ function Dashboard_patient() {
       case "My Records":
         return <div>📁 Medical Records displayed here</div>;
       case "Book Appointment":
-        return <div>📅 Appointment Booking UI</div>;
+        return <Appointment />;
       case "Consultation History":
         return <div>🩺 Past Consultations listed here</div>;
       case "Logout":
@@ -24,7 +25,7 @@ function Dashboard_patient() {
 
   return (
     <div>
-      <nav className="sticky top-0 left-0 w-full p-2 bg-white/5 backdrop-blur-md border-b-[1px] border-grey/20">
+      <nav className="sticky top-0 left-0 w-full p-2 bg-white/5 backdrop-blur-md border-b-[1px] border-black/30 z-20">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <img
@@ -64,9 +65,9 @@ function Dashboard_patient() {
         </div>
       </nav>
 
-      <div className="flex flex-row h-[90vh]">
+      <div className="flex h-screen">
         <div
-          className="bg-gray-100 w-1/4 p-4 flex flex-col gap-4 shadow-md"
+          className="bg-gray-100 w-1/4 p-4 flex flex-col gap-4 shadow-md fixed top-[64px] left-0 h-[calc(100vh-64px)] overflow-y-auto z-10"
           style={{ boxShadow: "4px 0 10px rgba(0, 0, 0, 0.1)" }}
         >
           {[
@@ -88,7 +89,7 @@ function Dashboard_patient() {
           ))}
         </div>
 
-        <div className=" w-3/4 p-4">{renderContent()}</div>
+        <div className="ml-[25%] w-3/4 p-4 overflow-y-auto h-[calc(100vh-64px)]">{renderContent()}</div>
       </div>
     </div>
   );
