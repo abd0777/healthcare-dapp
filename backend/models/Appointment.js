@@ -18,7 +18,7 @@ const appointmentSchema = new mongoose.Schema(
 
     patientGovtId: {
       type: String,
-      required: true,
+      required: false,
       index: true,
     },
 

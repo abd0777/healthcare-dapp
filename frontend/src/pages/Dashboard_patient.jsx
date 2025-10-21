@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import Profile from "../patient_dashboard/Profile";
 import Logout from "../patient_dashboard/Logout";
 import Appointment from "@/patient_dashboard/Appointment";
+import AppointmentHistory from "@/patient_dashboard/AppointmentHistory";
 
 function Dashboard_patient() {
   const [activeSection, setActiveSection] = useState("My Profile");
-
+  const [walletConnected, setWalletConnected] = useState("");
+  
   const renderContent = () => {
     switch (activeSection) {
       case "My Profile":
         return <Profile />;
-      case "My Records":
-        return <div>📁 Medical Records displayed here</div>;
       case "Book Appointment":
         return <Appointment />;
+      case "Appointment History":
+        return <AppointmentHistory />;
       case "Consultation History":
         return <div>🩺 Past Consultations listed here</div>;
       case "Logout":
@@ -22,6 +24,23 @@ function Dashboard_patient() {
         return <div>Select an option from the sidebar</div>;
     }
   };
+
+  const handleConnectWallet = async() => {
+    if(typeof window.ethereum === "undefined"){
+      console.log("MetaMask is not installed!");
+      return;
+    }
+
+    try {
+      const accounts = await window.ethereum.request({method : "eth_requestAccounts"});
+      setWalletConnected(accounts[0]);
+      console.log("Connected account:", accounts[0]);
+    }
+    catch(error){
+      console.error("Error connecting to MetaMask:", error);
+    }
+  }; 
+
 
   return (
     <div>
@@ -49,16 +68,16 @@ function Dashboard_patient() {
             </button>
 
             <button
-              className="px-2 py-2 rounded-lg cursor-pointer border border-black hover:bg-black hover:text-white transition duration-300 ease-in-out"
+              className= {`px-2 py-2 rounded-lg cursor-pointer border border-black hover:bg-black hover:text-white transition duration-300 ease-in-out ${walletConnected ? "bg-lime-400" : "bg-white" }`}
               style={{ boxShadow: "4px 4px 6px rgba(0, 0, 0, 0.5)" }}
             >
-              <div className="flex flex-row items-center gap-2">
+              <div className="flex flex-row items-center gap-2 " onClick={ handleConnectWallet }>
                 <img
                   src="/metamask-icon.png"
                   alt="MetaMask"
                   className="h-10 w-10"
                 />
-                <div>Connect Wallet</div>
+                <div>{ walletConnected ? "Wallet Connected" : "Connect Wallet" }</div>
               </div>
             </button>
           </div>
@@ -72,8 +91,8 @@ function Dashboard_patient() {
         >
           {[
             "My Profile",
-            "My Records",
             "Book Appointment",
+            "Appointment History",
             "Consultation History",
             "Logout",
           ].map((item) => (

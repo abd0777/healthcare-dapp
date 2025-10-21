@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Calendar, Clock, User, Mail, Award, Stethoscope, CheckCircle, XCircle } from "lucide-react";
-
+import { ethers, keccak256, AbiCoder, parseEther } from "ethers";
+import AppointmentPayment from "../../../build/contracts/AppointmentPayment.json";
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
 const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
+const FEE_ETH = "0.00018"; 
 
 function DoctorCard() {
   const [doctors, setDoctors] = useState([]);
@@ -22,20 +25,91 @@ function DoctorCard() {
     setSelectedDate("");
     setSelectedTime("");
     setBookedSlots([]);
-
-    const res = await axios.get("/api/appointments/check", {
-      params: {
-        licenseNumber: doctor.licenseNumber,
-        date: new Date().toISOString().slice(0, 10),
-      },
-    });
-    setBookedSlots(res.data);
   };
 
-  const handleConfirmBooking = () => {
-    // Booking logic here
-    console.log("Booking confirmed", { selectedDoctor, selectedDate, selectedTime });
+  // when date changes, fetch booked slots for that doctor/date
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      if (!selectedDoctor || !selectedDate) return;
+      try {
+        const res = await axios.get(`${BACKEND_URL}/appointments/check`, {
+          params: {
+            licenseNumber: selectedDoctor.licenseNumber,
+            date: selectedDate,
+          },
+        });
+        // backend should return array of times like ["10:00", "11:00"]
+        setBookedSlots(res.data.map((a) => a.time));
+      } catch (err) {
+        console.error("Error fetching booked slots:", err);
+      }
+    };
+    fetchBookedSlots();
+  }, [selectedDate, selectedDoctor]);
+
+
+  const handleConfirmBooking = async () => {
+    if (!selectedDate || !selectedTime || !selectedDoctor) return;
+
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask not detected");
+        return;
+      }
+
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const walletAddress = await signer.getAddress();
+
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, AppointmentPayment.abi, signer);
+
+      const nowTs = Math.floor(Date.now() / 1000);
+      const coder = new AbiCoder();
+      const encoded = coder.encode(["address", "string", "uint256"], [walletAddress, selectedDoctor.licenseNumber, nowTs]);
+      const appointmentId = keccak256(encoded);
+
+      const tx = await contract.payAndBook(
+        selectedDoctor.licenseNumber,
+        selectedDate,
+        selectedTime,
+        "Booked via frontend",
+        appointmentId,
+        { value: parseEther(FEE_ETH) }
+      );
+
+      await tx.wait();
+
+      await fetch(`${BACKEND_URL}/appointments/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          doctorLicenseNumber: selectedDoctor.licenseNumber,
+          doctorName: selectedDoctor.fullname,
+          specialization: selectedDoctor.specialization,
+          date: selectedDate,
+          time: selectedTime,
+          status: "confirmed",
+          paymentStatus: "paid",
+          walletAddress: walletAddress,
+          transactionHash: tx.hash,
+          notes: "Booked via frontend",
+          email: localStorage.getItem("email"),
+        })
+      });
+
+      alert(" Payment successful! Appointment will appear in your dashboard shortly.");
+
+      setSelectedDoctor(null);
+      setSelectedDate("");
+      setSelectedTime("");
+    } catch (err) {
+      console.error("Booking error:", err.message || err);
+      alert(" Payment failed. Please try again.");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4 mt-10 rounded-lg">
@@ -145,7 +219,7 @@ function DoctorCard() {
                     Available Time Slots
                   </label>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                    {["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00"].map((slot) => {
+                    {["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00"].map((slot) => {
                       const isBooked = bookedSlots.includes(slot);
                       const isSelected = selectedTime === slot;
                       

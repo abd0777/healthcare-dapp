@@ -5,6 +5,7 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import { GoogleGenAI } from "@google/genai";
+import appointmentRoutes from "./routes/appointmentRoutes.js";  
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ mongoose
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/doctors", userRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
