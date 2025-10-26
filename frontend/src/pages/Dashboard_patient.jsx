@@ -3,6 +3,7 @@ import Profile from "../patient_dashboard/Profile";
 import Logout from "../patient_dashboard/Logout";
 import Appointment from "@/patient_dashboard/Appointment";
 import AppointmentHistory from "@/patient_dashboard/AppointmentHistory";
+import Records from "@/patient_dashboard/Records";
 
 function Dashboard_patient() {
   const [activeSection, setActiveSection] = useState("My Profile");
@@ -12,6 +13,8 @@ function Dashboard_patient() {
     switch (activeSection) {
       case "My Profile":
         return <Profile />;
+      case "My Records":
+        return <Records />;
       case "Book Appointment":
         return <Appointment />;
       case "Appointment History":
@@ -91,6 +94,7 @@ function Dashboard_patient() {
         >
           {[
             "My Profile",
+            "My Records",
             "Book Appointment",
             "Appointment History",
             "Consultation History",

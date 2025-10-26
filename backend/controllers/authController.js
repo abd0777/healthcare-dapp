@@ -38,7 +38,7 @@ export const registerUser = async (req, res) => {
 };
 
 // LOGIN
-export const loginUser = async (req, res) => {
+export const loginPatient = async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
@@ -51,6 +51,39 @@ export const loginUser = async (req, res) => {
     const token = jwt.sign({ id: user._id, role: user.role, patientGovtId: user.govtId  }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     res.json({ message: "Login successful", token, role: user.role });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password, role } = req.body;
+
+    const user = await User.findOne({ email, role });
+    if (!user) return res.status(400).json({ message: "Invalid email or role" });
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) return res.status(400).json({ message: "Invalid password" });
+
+    // Only include id and role in token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      message: "Login successful",
+      token,
+      role: user.role,
+      user: {
+        id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -20,7 +20,8 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/auth/login`, {
+      const subRoute = (role === "patient") ? "login-patient" : "login";
+      const res = await fetch(`${BACKEND_URL}/auth/${subRoute}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),
