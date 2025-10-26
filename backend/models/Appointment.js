@@ -10,6 +10,20 @@ const appointmentSchema = new mongoose.Schema(
       index: true,
     },
 
+    doctorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
+    patientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
     doctorLicenseNumber: {
       type: String,
       required: true,
@@ -21,7 +35,7 @@ const appointmentSchema = new mongoose.Schema(
       required: false,
       index: true,
     },
-
+   // patientName: { type: String, required: true },
     doctorName: { type: String, required: true },
     specialization: { type: String, required: true },
 

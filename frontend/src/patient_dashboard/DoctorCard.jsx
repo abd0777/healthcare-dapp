@@ -88,6 +88,7 @@ function DoctorCard() {
           doctorLicenseNumber: selectedDoctor.licenseNumber,
           doctorName: selectedDoctor.fullname,
           specialization: selectedDoctor.specialization,
+          doctorId: selectedDoctor._id,
           date: selectedDate,
           time: selectedTime,
           status: "confirmed",

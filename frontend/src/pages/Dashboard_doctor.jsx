@@ -1,129 +1,126 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import Logout from "../doctor_dashboard/Logout";
+import { ClipboardEdit, FileText, MessageCircle, LogOut } from "lucide-react";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 function Dashboard_doctor() {
-    const [patients, setPatients] = useState([
-        { id: 1, name: "John Doe", age: 30, condition: "Diabetes" },
-        { id: 2, name: "Jane Smith", age: 25, condition: "Asthma" },
-    ]);
+  const [activeSection, setActiveSection] = useState("Appointments");
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const [menuOpen, setMenuOpen] = useState(false);
+  // Fetch appointments assigned to the logged-in doctor
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    async function fetchAppointments() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/appointments/doctor`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        console.log("dotor apoints ments ",data);
+        
+        setAppointments(data);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAppointments();
+  }, []);
 
-    const handlePrescribe = (id) => {
-        alert(`Add prescription for patient ID: ${id}`);
-        // Open modal/form to add prescription & push to blockchain
-    };
+  const renderContent = () => {
+    if (activeSection === "Logout") return <Logout />;
+    if (activeSection === "Appointments") {
+      if (loading) return <div>Loading appointments...</div>;
+      if (appointments.length === 0) return <div>No appointments found.</div>;
 
-    const handleVerify = (id) => {
-        alert(`Verifying blockchain records for patient ID: ${id}`);
-        // Blockchain verification logic
-    };
-
-    return (
-        <div className="relative">
-            {/* Navbar */}
-            <nav className="sticky top-0 left-0 w-full p-3 bg-white shadow-md flex justify-between items-center z-20">
-                {/* Hamburger button */}
-                <button 
-                    className="flex flex-col gap-1 p-2 rounded-md hover:bg-gray-200"
-                    onClick={() => setMenuOpen(!menuOpen)}
-                >
-                    <div className="w-6 h-1 bg-black"></div>
-                    <div className="w-6 h-1 bg-black"></div>
-                    <div className="w-6 h-1 bg-black"></div>
-                </button>
-
-                {/* Title */}
-                <div className="flex items-center gap-2">
-                    <img src="/doctor-icon.png" alt="doctor-icon" style={{ height: '30px', width: '30px' }} />
-                    <div className="text-2xl font-bold">Doctor Dashboard</div>
-                </div>
-
-                {/* Right icons */}
-                <div className='flex flex-row items-center gap-4'>
-                    {/* Notifications */}
-                    <button className="px-3 py-3 rounded-lg cursor-pointer border border-black hover:bg-black hover:text-white transition duration-300 ease-in-out"
-                    style={{ boxShadow: '4px 4px 6px rgba(0, 0, 0, 0.5)' }}
-                    >
-                        <img src="/notification-icon.png" alt="Notifications" style={{ height: '30px', width: '30px' }} />
-                    </button>
-
-                    {/* Wallet Connect */}
-                    <button className="px-2 py-2 rounded-lg cursor-pointer border border-black hover:bg-black hover:text-white transition duration-300 ease-in-out"
-                    style={{ boxShadow: '4px 4px 6px rgba(0, 0, 0, 0.5)' }} 
-                    >
-                        <div className='flex flex-row items-center gap-2'>
-                            <img src="/metamask-icon.png" alt="MetaMask" className="h-10 w-10" />
-                            <div>Connect Wallet</div> 
-                        </div>
-                    </button>
-                </div>
-            </nav>
-
-            {/* Sidebar (slide-in) */}
-            <div 
-                className={`fixed top-0 left-0 h-full w-64 bg-blue-100 shadow-lg transform transition-transform duration-300 z-30
-                ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {appointments.map((appt) => (
+            <div
+              key={appt.appointmentId}
+              className="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-4"
             >
-                <div className="p-4">
-                    <h2 className="text-lg font-bold mb-4">Menu</h2>
-                    <ul className="space-y-4">
-                        <li className="cursor-pointer hover:underline">View Patients</li>
-                        <li className="cursor-pointer hover:underline">Add Prescription</li>
-                        <li className="cursor-pointer hover:underline">Verify Records</li>
-                        <li className="cursor-pointer hover:underline">Settings</li>
-                    </ul>
-                </div>
-            </div>
+              <h3 className="text-xl font-bold text-gray-800">
+                {appt.patientName || "Patient"}
+              </h3>
+              <p className="text-gray-600">Date: {appt.date}</p>
+              <p className="text-gray-600">Time: {appt.time}</p>
+              <p className="text-gray-600">Notes: {appt.notes || "N/A"}</p>
 
-            {/* Overlay when menu is open */}
-            {menuOpen && (
-                <div 
-                    className="fixed inset-0 bg-black opacity-50 z-20"
-                    onClick={() => setMenuOpen(false)}
-                />
-            )}
-
-            {/* Main Content */}
-            <div className='p-4 mt-4'>
-                <h2 className="text-xl font-bold mb-4">Assigned Patients</h2>
-                <table className="w-full border border-gray-400 text-center">
-                    <thead>
-                        <tr className="bg-gray-200">
-                            <th className="border px-4 py-2">ID</th>
-                            <th className="border px-4 py-2">Name</th>
-                            <th className="border px-4 py-2">Age</th>
-                            <th className="border px-4 py-2">Condition</th>
-                            <th className="border px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {patients.map((p) => (
-                            <tr key={p.id}>
-                                <td className="border px-4 py-2">{p.id}</td>
-                                <td className="border px-4 py-2">{p.name}</td>
-                                <td className="border px-4 py-2">{p.age}</td>
-                                <td className="border px-4 py-2">{p.condition}</td>
-                                <td className="border px-4 py-2 flex justify-center gap-2">
-                                    <button 
-                                        className="px-2 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                                        onClick={() => handlePrescribe(p.id)}
-                                    >
-                                        Prescribe
-                                    </button>
-                                    <button 
-                                        className="px-2 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                                        onClick={() => handleVerify(p.id)}
-                                    >
-                                        Verify
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+              <div className="flex gap-3 mt-4">
+                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  <ClipboardEdit size={18} />
+                  Prescribe
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                  <FileText size={18} />
+                  View Records
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                  <MessageCircle size={18} />
+                  Chat
+                </button>
+              </div>
             </div>
+          ))}
         </div>
-    );
+      );
+    }
+
+    return <div>Select an option from the sidebar</div>;
+  };
+
+  return (
+    <div>
+      {/* Top Navigation */}
+      <nav className="sticky top-0 left-0 w-full p-2 bg-white/5 backdrop-blur-md border-b-[1px] border-black/30 z-20">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <img
+              src="/doctor-icon.png"
+              alt="doctor-icon"
+              style={{ height: "30px", width: "30px" }}
+            />
+            <div className="text-2xl font-bold">Doctor Dashboard</div>
+          </div>
+          <button
+            className="px-3 py-2 rounded-lg cursor-pointer border border-black hover:bg-black hover:text-white transition duration-300 ease-in-out"
+            onClick={() => setActiveSection("Logout")}
+          >
+            <LogOut size={20} className="inline-block mr-2" />
+            Logout
+          </button>
+        </div>
+      </nav>
+
+      {/* Sidebar + Content */}
+      <div className="flex h-screen">
+        <div
+          className="bg-gray-100 w-1/4 p-4 flex flex-col gap-4 shadow-md fixed top-[64px] left-0 h-[calc(100vh-64px)] overflow-y-auto z-10"
+          style={{ boxShadow: "4px 0 10px rgba(0, 0, 0, 0.1)" }}
+        >
+          {["Appointments", "Logout"].map((item) => (
+            <span
+              key={item}
+              className={`menu-item cursor-pointer ${
+                activeSection === item ? "font-bold text-blue-600" : ""
+              }`}
+              onClick={() => setActiveSection(item)}
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+
+        <div className="ml-[25%] w-3/4 p-4 overflow-y-auto h-[calc(100vh-64px)]">
+          {renderContent()}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Dashboard_doctor;

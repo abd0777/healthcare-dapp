@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     contactPerson: { type: String }, // Insurer
     address: { type: String },
 
-    govtId: { type: String },
+    govtId: { type: String, required: true, unique: true },
     profilePic: { type: String, default: "" },
   },
   { timestamps: true }
