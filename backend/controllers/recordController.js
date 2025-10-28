@@ -155,7 +155,7 @@ export async function streamDecryptedRecord(req, res) {
   try {
     const { cid } = req.params;
     const gateway = process.env.PINATA_GATEWAY;
-    const masterKey = Buffer.from(process.env.MASTER_KEY, 'base64'); // 32 bytes
+    const masterKey = Buffer.from(process.env.MASTER_KEY, 'base64'); 
 
     const fileRes = await axios.get(`${gateway}/ipfs/${cid}`, {
       responseType: 'arraybuffer',
@@ -164,9 +164,9 @@ export async function streamDecryptedRecord(req, res) {
     const encryptedBuffer = Buffer.from(fileRes.data);
 
     // Decrypt using AES-256-GCM
-    const iv = encryptedBuffer.slice(0, 12); // GCM uses 12-byte IV
-    const authTag = encryptedBuffer.slice(12, 28); // Last 16 bytes
-    const encryptedData = encryptedBuffer.slice(28); // Middle chunk
+    const iv = encryptedBuffer.slice(0, 12); 
+    const authTag = encryptedBuffer.slice(12, 28); 
+    const encryptedData = encryptedBuffer.slice(28); 
 
     const decipher = crypto.createDecipheriv('aes-256-gcm', masterKey, iv);
     decipher.setAuthTag(authTag);

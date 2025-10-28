@@ -4,6 +4,7 @@ import Logout from "../patient_dashboard/Logout";
 import Appointment from "@/patient_dashboard/Appointment";
 import AppointmentHistory from "@/patient_dashboard/AppointmentHistory";
 import Records from "@/patient_dashboard/Records";
+import ConsultationHistory from "@/patient_dashboard/ConsultationHistory";
 
 function Dashboard_patient() {
   const [activeSection, setActiveSection] = useState("My Profile");
@@ -20,7 +21,7 @@ function Dashboard_patient() {
       case "Appointment History":
         return <AppointmentHistory />;
       case "Consultation History":
-        return <div>🩺 Past Consultations listed here</div>;
+        return <ConsultationHistory />;
       case "Logout":
         return <Logout />;
       default:
