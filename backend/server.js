@@ -7,6 +7,8 @@ import userRoutes from "./routes/userRoutes.js";
 import { GoogleGenAI } from "@google/genai";
 import appointmentRoutes from "./routes/appointmentRoutes.js";  
 import recordRoutes from "./routes/recordRoutes.js";
+import prescriptionRoutes from "./routes/prescriptionRoutes.js";
+
 
 dotenv.config();
 
@@ -24,6 +26,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/doctors", userRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/records", recordRoutes);
+app.use("/api/prescriptions", prescriptionRoutes);
+
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,

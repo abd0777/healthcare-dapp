@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Logout from "../doctor_dashboard/Logout";
 import DoctorRecords from "../doctor_dashboard/DoctorRecords";
-import {
-  ClipboardEdit,
-  FileText,
-  MessageCircle,
-  LogOut,
-} from "lucide-react";
+import DoctorPrescribe from "../doctor_dashboard/DoctorPrescribe";
+import { ClipboardEdit, FileText, MessageCircle, LogOut } from "lucide-react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -15,6 +11,7 @@ function Dashboard_doctor() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [selectedPrescribe, setSelectedPrescribe] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -58,7 +55,15 @@ function Dashboard_doctor() {
                   <p className="text-gray-600">Notes: {appt.notes || "N/A"}</p>
 
                   <div className="flex gap-3 mt-4">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    <button
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      onClick={() =>
+                        setSelectedPrescribe({
+                          appointmentId: appt.appointmentId,
+                          patientId: appt.patientId, // ✅ MongoDB ID
+                        })
+                      }
+                    >
                       <ClipboardEdit size={18} />
                       Prescribe
                     </button>
@@ -67,7 +72,7 @@ function Dashboard_doctor() {
                       onClick={() =>
                         setSelectedRecord({
                           appointmentId: appt.appointmentId,
-                          patientGovtId: appt.patientGovtId,
+                          patientGovtId: appt.patientGovtId, // ✅ still used for records
                         })
                       }
                     >
@@ -96,6 +101,16 @@ function Dashboard_doctor() {
               >
                 Close Records
               </button>
+            </div>
+          )}
+
+          {selectedPrescribe && (
+            <div className="mt-6">
+              <DoctorPrescribe
+                appointmentId={selectedPrescribe.appointmentId}
+                patientId={selectedPrescribe.patientId}
+                onClose={() => setSelectedPrescribe(null)}
+              />
             </div>
           )}
         </div>
@@ -143,6 +158,7 @@ function Dashboard_doctor() {
               onClick={() => {
                 setActiveSection(item);
                 setSelectedRecord(null);
+                setSelectedPrescribe(null);
               }}
             >
               {item}
