@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Logout from "../doctor_dashboard/Logout";
-import { ClipboardEdit, FileText, MessageCircle, LogOut } from "lucide-react";
+import DoctorRecords from "../doctor_dashboard/DoctorRecords";
+import {
+  ClipboardEdit,
+  FileText,
+  MessageCircle,
+  LogOut,
+} from "lucide-react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -8,8 +14,8 @@ function Dashboard_doctor() {
   const [activeSection, setActiveSection] = useState("Appointments");
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
-  // Fetch appointments assigned to the logged-in doctor
   useEffect(() => {
     const token = localStorage.getItem("token");
     async function fetchAppointments() {
@@ -18,8 +24,6 @@ function Dashboard_doctor() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        console.log("dotor apoints ments ",data);
-        
         setAppointments(data);
       } catch (err) {
         console.error("Error fetching appointments:", err);
@@ -33,39 +37,67 @@ function Dashboard_doctor() {
   const renderContent = () => {
     if (activeSection === "Logout") return <Logout />;
     if (activeSection === "Appointments") {
-      if (loading) return <div>Loading appointments...</div>;
-      if (appointments.length === 0) return <div>No appointments found.</div>;
-
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {appointments.map((appt) => (
-            <div
-              key={appt.appointmentId}
-              className="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-4"
-            >
-              <h3 className="text-xl font-bold text-gray-800">
-                {appt.patientName || "Patient"}
-              </h3>
-              <p className="text-gray-600">Date: {appt.date}</p>
-              <p className="text-gray-600">Time: {appt.time}</p>
-              <p className="text-gray-600">Notes: {appt.notes || "N/A"}</p>
+        <div>
+          {loading ? (
+            <div>Loading appointments...</div>
+          ) : appointments.length === 0 ? (
+            <div>No appointments found.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {appointments.map((appt) => (
+                <div
+                  key={appt.appointmentId}
+                  className="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-4"
+                >
+                  <h3 className="text-xl font-bold text-gray-800">
+                    {appt.patientName || "Patient"}
+                  </h3>
+                  <p className="text-gray-600">Date: {appt.date}</p>
+                  <p className="text-gray-600">Time: {appt.time}</p>
+                  <p className="text-gray-600">Notes: {appt.notes || "N/A"}</p>
 
-              <div className="flex gap-3 mt-4">
-                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                  <ClipboardEdit size={18} />
-                  Prescribe
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                  <FileText size={18} />
-                  View Records
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
-                  <MessageCircle size={18} />
-                  Chat
-                </button>
-              </div>
+                  <div className="flex gap-3 mt-4">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                      <ClipboardEdit size={18} />
+                      Prescribe
+                    </button>
+                    <button
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                      onClick={() =>
+                        setSelectedRecord({
+                          appointmentId: appt.appointmentId,
+                          patientGovtId: appt.patientGovtId,
+                        })
+                      }
+                    >
+                      <FileText size={18} />
+                      View Records
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                      <MessageCircle size={18} />
+                      Chat
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {selectedRecord && (
+            <div className="mt-6">
+              <DoctorRecords
+                appointmentId={selectedRecord.appointmentId}
+                patientGovtId={selectedRecord.patientGovtId}
+              />
+              <button
+                onClick={() => setSelectedRecord(null)}
+                className="mt-4 text-sm text-red-600 hover:underline"
+              >
+                Close Records
+              </button>
+            </div>
+          )}
         </div>
       );
     }
@@ -108,7 +140,10 @@ function Dashboard_doctor() {
               className={`menu-item cursor-pointer ${
                 activeSection === item ? "font-bold text-blue-600" : ""
               }`}
-              onClick={() => setActiveSection(item)}
+              onClick={() => {
+                setActiveSection(item);
+                setSelectedRecord(null);
+              }}
             >
               {item}
             </span>

@@ -113,7 +113,7 @@ export const doctorAppointments = async (req, res) => {
     const appointments = await Appointment.find({
       doctorId: doctorId,
     });
-    console.log('Doctor Appointments:', doctorId,appointments );
+   // console.log('Doctor Appointments:', doctorId,appointments );
     res.status(200).json(appointments);
   } catch (err) {
     console.error("Error fetching doctor appointments:", err);

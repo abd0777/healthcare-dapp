@@ -185,3 +185,32 @@ export async function streamDecryptedRecord(req, res) {
   }
 }
 
+export const getRecordsForDoctor = async (req, res) => {
+  try {
+    const { appointmentId, patientGovtId } = req.query;
+
+    if (!appointmentId || !patientGovtId) {
+      return res.status(400).json({ success: false, message: "Missing parameters" });
+    }
+
+    const recordDoc = await Records.findOne({ patientGovtId });
+    if (!recordDoc) return res.status(404).json({ success: false, message: "No records found" });
+
+    const gateway = process.env.PINATA_GATEWAY;
+
+    const accessibleRecords = recordDoc.records
+      .filter((r) => r.accessList.includes(appointmentId))
+      .map((r) => ({
+        _id: r._id,
+        fileName: r.filename,
+        uploadedAt: r.uploadedAt,
+        cidEncrypted: r.cidEncrypted,
+        blobUrl: `${gateway}/ipfs/${r.cidEncrypted}`,
+      }));
+
+    res.json({ success: true, records: accessibleRecords });
+  } catch (err) {
+    console.error("Doctor record fetch error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

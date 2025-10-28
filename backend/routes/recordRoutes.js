@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadRecord, getMyRecords, toggleAccess, streamDecryptedRecord} from '../controllers/recordController.js';
+import { uploadRecord, getMyRecords, toggleAccess, streamDecryptedRecord,getRecordsForDoctor} from '../controllers/recordController.js';
 import verifyToken from '../middleware/verifyToken.js';
 
 const router = express.Router();
@@ -10,5 +10,12 @@ router.post('/upload-record', verifyToken, upload.single('file'), uploadRecord);
 router.get('/my-records', verifyToken, getMyRecords);
 router.post('/toggle-access', verifyToken, toggleAccess);
 router.get('/decrypted/:cid', verifyToken, streamDecryptedRecord);
+router.get("/doctor-access", verifyToken, getRecordsForDoctor);
+
 
 export default router;
+
+
+
+
+
