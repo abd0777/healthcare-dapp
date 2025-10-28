@@ -1,61 +1,118 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Upload, FileText, Eye, Calendar, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 export default function PatientRecords() {
   const [file, setFile] = useState(null);
-  const [records, setRecords] = useState([
-    {
-      _id: 'rec1',
-      fileName: 'MRI_Report.pdf',
-      uploadedAt: '2025-10-01T10:30:00Z',
-      blobUrl: '/sample/mri.pdf',
-      appointments: [
-        { id: 'APT001', accessGranted: true },
-        { id: 'APT002', accessGranted: false },
-      ],
-    },
-    {
-      _id: 'rec2',
-      fileName: 'BloodTest.pdf',
-      uploadedAt: '2025-09-15T14:45:00Z',
-      blobUrl: '/sample/bloodtest.pdf',
-      appointments: [
-        { id: 'APT003', accessGranted: false },
-      ],
-    },
-  ]);
+  const [records, setRecords] = useState([]);
   const [previewBlob, setPreviewBlob] = useState(null);
   const [expandedRecords, setExpandedRecords] = useState({});
-
-  const handleUpload = () => {
-    const newRecord = {
-      _id: `rec${records.length + 1}`,
-      fileName: file?.name || 'NewRecord.pdf',
-      uploadedAt: new Date().toISOString(),
-      blobUrl: URL.createObjectURL(file),
-      appointments: [
-        { id: 'APT001', accessGranted: false },
-        { id: 'APT002', accessGranted: false },
-      ],
+  const previewRef = useRef(null);
+  //  Fetch records on mount
+  useEffect(() => {
+    const fetchRecords = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/records/my-records`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        const { success, records } = await res.json();
+        if (success && records) {
+          setRecords(records);
+        }
+      } catch (err) {
+        console.error('Failed to fetch records:', err);
+      }
     };
-    setRecords([...records, newRecord]);
-    alert('Mock upload complete');
+
+    fetchRecords();
+  }, []);
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('filename', file.name);
+
+      const res = await fetch(`${BACKEND_URL}/records/upload-record`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+
+      const { success, record } = await res.json();
+
+      if (success && record) {
+        setRecords(prev => [...prev, record]);
+        setFile(null);
+        alert('Encrypted upload complete');
+      } else {
+        alert('Upload failed');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('Something went wrong during upload');
+    }
   };
 
-  const toggleAccess = (recordId, appointmentId) => {
-    const updated = records.map((r) => {
-      if (r._id !== recordId) return r;
-      const updatedAppointments = r.appointments.map((a) =>
-        a.id === appointmentId ? { ...a, accessGranted: !a.accessGranted } : a
-      );
-      return { ...r, appointments: updatedAppointments };
-    });
-    setRecords(updated);
+
+  const toggleAccess = async (recordId, appointmentId, grant) => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/records/toggle-access`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ recordId, appointmentId, grant }),
+      });
+
+      const { success } = await res.json();
+      if (success) {
+        setRecords(prev =>
+          prev.map(r => {
+            if (r._id !== recordId) return r;
+            const updatedAppointments = r.appointments.map(a =>
+              a.id === appointmentId ? { ...a, accessGranted: grant } : a
+            );
+            return { ...r, appointments: updatedAppointments };
+          })
+        );
+      }
+    } catch (err) {
+      console.error('Toggle access error:', err);
+    }
   };
 
-  const handlePreview = (blobUrl) => {
-    setPreviewBlob(blobUrl);
+
+  const handlePreview = async (cidEncrypted) => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/records/decrypted/${cidEncrypted}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setPreviewBlob(url);
+
+      setTimeout(() => {
+        previewRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } catch (err) {
+      console.error('Preview fetch failed:', err);
+      alert('Failed to load preview');
+    }
   };
+
+
 
   const toggleExpand = (recordId) => {
     setExpandedRecords(prev => ({
@@ -133,7 +190,7 @@ export default function PatientRecords() {
                   </div>
                   
                   <button 
-                    onClick={() => handlePreview(r.blobUrl)} 
+                    onClick={() => handlePreview(r.cidEncrypted)} 
                     className="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700 transition-colors font-medium"
                   >
                     Preview
@@ -168,8 +225,11 @@ export default function PatientRecords() {
                         key={a.id} 
                         className="flex justify-between items-center bg-gray-50 p-2 rounded"
                       >
-                        <span className="text-sm text-gray-700">ID: {a.id}</span>
-                        
+                        <span className="text-sm text-gray-700">
+                          {a.doctorName} ({a.specialization}) — {a.date} at {a.time} 
+                          {/* < br/> {`(ID: ${a.id})`} */}
+                        </span>
+                       
                         <label className="flex items-center gap-2 cursor-pointer">
                           <span className="text-sm text-gray-700">
                             {a.accessGranted ? 'Access Granted' : 'Access Revoked'}
@@ -178,7 +238,7 @@ export default function PatientRecords() {
                             <input
                               type="checkbox"
                               checked={a.accessGranted}
-                              onChange={() => toggleAccess(r._id, a.id)}
+                              onChange={() => toggleAccess(r._id, a.id, !a.accessGranted)}
                               className="sr-only"
                             />
                             <div className={`w-11 h-6 rounded-full transition-colors ${a.accessGranted ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
@@ -196,14 +256,16 @@ export default function PatientRecords() {
 
         {/* PDF Preview */}
         {previewBlob && (
-          <div className="mt-6 bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+          <div 
+            ref={previewRef}
+            className="mt-6 bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200">
               <h3 className="font-semibold text-gray-900">Document Preview</h3>
             </div>
             <iframe 
               src={previewBlob} 
               title="PDF Preview" 
-              className="w-full h-96"
+              className="w-full h-[48rem]"
             />
           </div>
         )}

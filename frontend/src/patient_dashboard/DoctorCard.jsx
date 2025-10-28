@@ -74,7 +74,7 @@ function DoctorCard() {
         selectedDoctor.licenseNumber,
         selectedDate,
         selectedTime,
-        "Booked via frontend",
+        "Appointment booked online",
         appointmentId,
         { value: parseEther(FEE_ETH) }
       );
@@ -95,7 +95,7 @@ function DoctorCard() {
           paymentStatus: "paid",
           walletAddress: walletAddress,
           transactionHash: tx.hash,
-          notes: "Booked via frontend",
+          notes: "Appointment booked online",
           email: localStorage.getItem("email"),
         })
       });
